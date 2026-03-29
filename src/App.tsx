@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 type StageKey = "plan" | "proc" | "exec";
 
@@ -429,18 +431,21 @@ function StageScreen(props: {
           ))}
         </div>
 
-        <div className="responsive-two">
+        <div className="section-gap">
+          <h3>2. Управляемость риска</h3>
           <ScoreField
-            label="Управляемость риска"
+            label="Коэффициент управляемости"
             help="1 - риск практически не поддаётся контролю; 2 - контролируется частично; 3 - контролируется в высокой степени."
             value={props.manageabilityValue}
             onChange={props.onManageabilityChange}
             options={SCORE_OPTIONS_1_3}
           />
+        </div>
 
+        <div className="section-gap">
+          <h3>3. Коррупционная уязвимость процедуры</h3>
           {props.showCorruption ? (
             <section className="panel">
-              <div className="field-title">Коррупционная уязвимость процедуры</div>
               <div className="muted">Для предпроцедурного и процедурного этапов выберите тип процедуры.</div>
               <div className="stack">
                 {CORRUPTION_OPTIONS.map((option) => (
@@ -465,7 +470,7 @@ function StageScreen(props: {
         </div>
 
         <div className="section-gap">
-          <h3>2. Бинарные индикаторы риска</h3>
+          <h3>4. Бинарные индикаторы риска</h3>
           {props.indicators.map((indicator) => (
             <BinaryField
               key={indicator.key}
@@ -567,7 +572,7 @@ function ResultsScreen(props: {
           </div>
         </section>
 
-        <section className="card">
+        <section className="card print-card">
           <div className="card-header">
             <h2>Результаты расчёта</h2>
             <p>Ниже показаны риски по этапам и общий уровень риска закупки.</p>
@@ -601,12 +606,12 @@ function ResultsScreen(props: {
           </div>
         </section>
 
-        <section className="card">
+        <section className="card print-card recommendations-card">
           <div className="card-header">
             <h2>Рекомендации по минимизации риска</h2>
             <p>Сначала показаны общие меры по стратегии, затем меры для наиболее рискованного этапа.</p>
           </div>
-          <div className="card-content section-gap">
+          <div className="card-content section-gap print-recommendations-grid">
             <div>
               <h3>1. Общие меры</h3>
               <ul className="list">
@@ -635,9 +640,38 @@ function ResultsScreen(props: {
               <summary>Показать формулы и порядок расчёта</summary>
               <div className="formula-content">
                 <div className="panel panel-tight nested-panel">
-                  <div>Предпроцедурный этап: P = {formatNumber(props.results.plan.P)}, I = {formatNumber(props.results.plan.I)}, M = {formatNumber(props.results.plan.M)}, Kc = {formatNumber(props.data.corruption.plan)}, ΣZ = {props.results.plan.Z}, R = {formatNumber(props.results.plan.R)}</div>
-                  <div>Процедурный этап: P = {formatNumber(props.results.proc.P)}, I = {formatNumber(props.results.proc.I)}, M = {formatNumber(props.results.proc.M)}, Kc = {formatNumber(props.data.corruption.proc)}, ΣZ = {props.results.proc.Z}, R = {formatNumber(props.results.proc.R)}</div>
-                  <div>Постпроцедурный этап: P = {formatNumber(props.results.exec.P)}, I = {formatNumber(props.results.exec.I)}, M = {formatNumber(props.results.exec.M)}, ΣZ = {props.results.exec.Z}, R = {formatNumber(props.results.exec.R)}</div>
+                  <div className="formula-stage-summary">
+                    <div className="formula-stage-title">Предпроцедурный этап</div>
+                    <div className="formula-stage-values">
+                      <span>P = {formatNumber(props.results.plan.P)}</span>
+                      <span>I = {formatNumber(props.results.plan.I)}</span>
+                      <span>M = {formatNumber(props.results.plan.M)}</span>
+                      <span>Kc = {formatNumber(props.data.corruption.plan)}</span>
+                      <span>ΣZ = {props.results.plan.Z}</span>
+                      <span>R = {formatNumber(props.results.plan.R)}</span>
+                    </div>
+                  </div>
+                  <div className="formula-stage-summary">
+                    <div className="formula-stage-title">Процедурный этап</div>
+                    <div className="formula-stage-values">
+                      <span>P = {formatNumber(props.results.proc.P)}</span>
+                      <span>I = {formatNumber(props.results.proc.I)}</span>
+                      <span>M = {formatNumber(props.results.proc.M)}</span>
+                      <span>Kc = {formatNumber(props.data.corruption.proc)}</span>
+                      <span>ΣZ = {props.results.proc.Z}</span>
+                      <span>R = {formatNumber(props.results.proc.R)}</span>
+                    </div>
+                  </div>
+                  <div className="formula-stage-summary">
+                    <div className="formula-stage-title">Постпроцедурный этап</div>
+                    <div className="formula-stage-values">
+                      <span>P = {formatNumber(props.results.exec.P)}</span>
+                      <span>I = {formatNumber(props.results.exec.I)}</span>
+                      <span>M = {formatNumber(props.results.exec.M)}</span>
+                      <span>ΣZ = {props.results.exec.Z}</span>
+                      <span>R = {formatNumber(props.results.exec.R)}</span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="formula-pretty">
@@ -783,21 +817,62 @@ export default function App() {
     }));
   };
 
-  const exportPdfReport = () => {
-    window.print();
+  const exportPdfReport = async () => {
+    const report = document.getElementById("report-dashboard");
+    if (!report) return;
+    const exportRoot = document.createElement("div");
+    exportRoot.style.position = "fixed";
+    exportRoot.style.left = "-20000px";
+    exportRoot.style.top = "0";
+    exportRoot.style.width = "1122px";
+    exportRoot.style.padding = "24px";
+    exportRoot.style.background = "#ffffff";
+    exportRoot.style.zIndex = "-1";
+
+    const clone = report.cloneNode(true) as HTMLElement;
+    clone.id = "report-dashboard-export";
+    clone.querySelectorAll(".no-print").forEach((element) => element.remove());
+    clone.querySelectorAll(".print-only").forEach((element) => {
+      const node = element as HTMLElement;
+      node.style.display = "block";
+    });
+
+    exportRoot.appendChild(clone);
+    document.body.appendChild(exportRoot);
+
+    try {
+      const canvas = await html2canvas(exportRoot, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const availableWidth = pageWidth - margin * 2;
+      const availableHeight = pageHeight - margin * 2;
+      const scale = Math.min(availableWidth / canvas.width, availableHeight / canvas.height);
+      const renderWidth = canvas.width * scale;
+      const renderHeight = canvas.height * scale;
+      const x = (pageWidth - renderWidth) / 2;
+      const y = margin;
+
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, renderWidth, renderHeight);
+      pdf.save("Отчёт_по_риску_закупки.pdf");
+    } finally {
+      document.body.removeChild(exportRoot);
+    }
   };
 
   return (
     <div className="app-shell">
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          #report-dashboard, #report-dashboard * { visibility: visible; }
-          #report-dashboard { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 24px; }
-          .no-print { display: none !important; }
-        }
-      `}</style>
-
       <main className="container">
         <section className="card hero-card">
           <div className="hero-top">
@@ -807,8 +882,14 @@ export default function App() {
             </div>
             <span className="step-chip">Шаг {step + 1} из {STEP_TITLES.length}</span>
           </div>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          <div className="step-progress-grid" aria-label="Прогресс по этапам">
+            {STEP_TITLES.map((title, index) => (
+              <div
+                key={title}
+                className={`step-progress-segment ${index <= step ? "active" : ""}`}
+                title={title}
+              />
+            ))}
           </div>
         </section>
 
