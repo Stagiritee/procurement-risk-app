@@ -642,7 +642,12 @@ h3 {
   }
 
   .step-progress-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .step-progress-segment {
+    height: 12px;
   }
 }
 
