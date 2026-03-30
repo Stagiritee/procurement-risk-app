@@ -1,0 +1,10 @@
+{
+  "name": "Калькулятор риска закупки",
+  "short_name": "Риск закупки",
+  "description": "Веб-приложение для расчёта риска по этапам закупки и формирования рекомендаций.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6fbff",
+  "theme_color": "#1e293b",
+  "lang": "ru"
+}
