@@ -80,50 +80,50 @@ const SCORE_OPTIONS_1_3 = [1, 2, 3];
 const STRATEGY_RULES: RiskRule[] = [
   {
     min: 0,
-    max: 4.99,
+    max: 5,
     level: "Низкий",
     colorClass: "risk-low",
     strategy: "Принятие риска",
     measures: [
-      "Осуществлять закупку в стандартном режиме контроля.",
-      "Проводить выборочную проверку документов и сроков.",
-      "Фиксировать результаты для накопления базы аналогичных закупок.",
+      "Принятие риска при сохранении стандартного режима внутреннего контроля.",
+      "Выборочная проверка ключевых документов, сроков и корректности действий ответственных лиц.",
+      "Фиксация результатов закупки для использования как положительной практики при проведении аналогичных процедур.",
     ],
   },
   {
     min: 5,
-    max: 9.99,
+    max: 15,
     level: "Средний",
     colorClass: "risk-medium",
     strategy: "Снижение риска",
     measures: [
-      "Провести дополнительную проверку документации и расчёта Н(М)ЦК.",
-      "Повторно проверить соответствие закупки требованиям законодательства.",
-      "Уточнить состав комиссии и распределение ответственности.",
+      "Снижение риска за счёт дополнительной проверки документов, расчёта Н(М)ЦК, условий извещения и проекта контракта.",
+      "Дополнительная проверка ключевых решений и документов по закупке до перехода к следующему этапу.",
+      "Проведение дополнительного ведомственного контроля по наиболее чувствительным элементам закупки.",
     ],
   },
   {
-    min: 10,
-    max: 19.99,
+    min: 15,
+    max: 25,
     level: "Высокий",
     colorClass: "risk-high",
     strategy: "Усиленный контроль",
     measures: [
-      "Назначить дополнительную правовую и финансовую экспертизу закупки.",
-      "Усилить контроль со стороны контрактной службы и профильного подразделения.",
-      "Проводить промежуточный мониторинг на наиболее рискованном этапе.",
+      "Усиленный контроль с обязательным повторным правовым и финансовым анализом закупки.",
+      "Перенос закупки на уровень дополнительного согласования с руководством.",
+      "Назначение промежуточного мониторинга по наиболее рискованному этапу и фиксация контрольных точек исполнения.",
     ],
   },
   {
-    min: 20,
+    min: 25,
     max: Number.POSITIVE_INFINITY,
     level: "Критический",
     colorClass: "risk-critical",
     strategy: "Избежание или пересмотр закупки",
     measures: [
-      "Пересмотреть параметры закупки, сроки, способ закупки и структуру лота.",
-      "Передать закупку на уровень усиленного согласования с руководством.",
-      "До проведения закупки устранить ключевые факторы риска.",
+      "Избежание риска или пересмотр параметров закупки до начала дальнейших действий.",
+      "Переработка способа закупки, сроков, структуры лотов, требований к участникам или условий исполнения контракта.",
+      "Временное приостановление закупочных действий до устранения ключевых факторов риска и повторной оценки.",
     ],
   },
 ];
@@ -179,7 +179,13 @@ const STAGES: Record<StageKey, StageConfig> = {
       { key: "recentLawChanges", label: "За 4 месяца до закупки были существенные изменения законодательства" },
       { key: "newResponsibleOfficer", label: "Ответственное должностное лицо ранее не участвовало в закупках" },
     ],
-    stageMeasures: ["Дополнительно проверить обоснование Н(М)ЦК.", "Провести повторную правовую экспертизу способа закупки.", "Проверить описание объекта закупки на предмет избыточных требований."],
+    stageMeasures: [
+      "Проверить обоснование Н(М)ЦК на актуальность источников ценовой информации, сопоставимость коммерческих предложений и корректность выбранного метода расчёта.",
+      "Провести повторную правовую проверку способа закупки, проекта извещения и описания объекта закупки на предмет избыточных, ограничительных или дискриминационных требований.",
+      "Отдельно проверить влияние национального режима, специальных требований к участникам и иных нормативных ограничений на состав документации.",
+      "При высокой срочности закупки ввести дополнительное согласование со стороны контрактной службы или юридического подразделения.",
+      "Если закупка проводится по новому или редкому предмету, использовать консультации профильных специалистов и анализ аналогичных закупок других заказчиков.",
+    ],
   },
   proc: {
     title: "Процедурный этап",
@@ -195,7 +201,13 @@ const STAGES: Record<StageKey, StageConfig> = {
       { key: "highSecurityRequirements", label: "Требования к обеспечению выше обычно устанавливаемого уровня" },
       { key: "foreignBan1875", label: "Установлен запрет по Постановлению № 1875" },
     ],
-    stageMeasures: ["Усилить правовую проверку извещения и критериев оценки.", "Проверить достаточность и компетенции состава комиссии.", "Провести внутреннюю проверку на предмет ограничения конкуренции."],
+    stageMeasures: [
+      "Проверить корректность критериев оценки, порядок рассмотрения заявок и соответствие действий комиссии требованиям законодательства.",
+      "Оценить достаточность квалификации, численности и независимости состава закупочной комиссии; при необходимости скорректировать её состав или привлечь дополнительных специалистов.",
+      "Организовать внутреннюю проверку на предмет ограничения конкуренции, необоснованного завышения требований к обеспечению и иных условий, способных сократить круг участников.",
+      "При наличии опыта жалоб, сложных критериев или низкой конкурентности рынка предусмотреть дополнительное документирование решений комиссии.",
+      "Для закупок с повышенной коррупционной уязвимостью обеспечить усиленный контроль за оформлением протоколов, сроками процедур и действиями ответственных лиц.",
+    ],
   },
   exec: {
     title: "Постпроцедурный этап",
@@ -211,7 +223,13 @@ const STAGES: Record<StageKey, StageConfig> = {
       { key: "fastPayment", label: "Оплата осуществляется менее чем за 7 рабочих дней" },
       { key: "endOfYear", label: "Приёмка и оплата планируются на конец финансового года" },
     ],
-    stageMeasures: ["Усилить контроль процедуры приёмки и фиксации результатов.", "При необходимости привлечь эксперта или расширить приёмочную комиссию.", "Организовать отдельный мониторинг сроков оплаты и исполнения."],
+    stageMeasures: [
+      "Усилить контроль приёмки: обеспечить полноту документального подтверждения поставки, выполнения работ или оказания услуг.",
+      "При сложной или многоэтапной приёмке привлекать экспертов, профильных специалистов или расширенный состав приёмочной комиссии.",
+      "Отдельно контролировать правомерность изменений условий контракта, включая сроки, объём, цену и основания для корректировок.",
+      "Организовать мониторинг сроков оплаты, особенно при риске конца финансового года, ускоренной приёмки или поэтапного исполнения.",
+      "По закупкам с высокой гарантийной или технологической зависимостью от поставщика предусматривать дополнительные меры сопровождения исполнения контракта.",
+    ],
   },
 };
 
@@ -256,7 +274,10 @@ function formatNumber(value: number) {
 }
 
 function getRiskMeta(score: number) {
-  return STRATEGY_RULES.find((rule) => score >= rule.min && score <= rule.max) ?? STRATEGY_RULES[0];
+  if (score < 5) return STRATEGY_RULES[0];
+  if (score < 15) return STRATEGY_RULES[1];
+  if (score < 25) return STRATEGY_RULES[2];
+  return STRATEGY_RULES[3];
 }
 
 function getDefaultLegalScore(stage: StageKey) {
@@ -513,7 +534,7 @@ function ResultCard(props: {
 }
 
 function RiskScale({ score }: { score: number }) {
-  const maxValue = 25;
+  const maxValue = 40;
   const marker = Math.min((score / maxValue) * 100, 100);
 
   return (
@@ -525,14 +546,11 @@ function RiskScale({ score }: { score: number }) {
           <div className="scale-stick" />
         </div>
       </div>
-      <div className="scale-points">
-        <span>0</span>
-        <span>{maxValue}</span>
-      </div>
       <div className="scale-zone-labels bottom">
         <span className="zone-low">Низкий</span>
         <span className="zone-medium">Средний</span>
         <span className="zone-high">Высокий</span>
+        <span className="zone-critical">Критический</span>
       </div>
     </div>
   );
@@ -548,11 +566,12 @@ function ResultsScreen(props: {
     exec: StageResult;
     totalRisk: number;
     totalMeta: RiskRule;
-    mostDangerousStage: { key: StageKey; title: string; value: number };
+    mostDangerousStages: Array<{ key: StageKey; title: string; value: number }>;
   };
   onExportPdf: () => void;
 }) {
-  const stageSpecificMeasures = STAGES[props.results.mostDangerousStage.key].stageMeasures;
+  const highlightedStages = props.results.mostDangerousStages;
+  const stageTitlesText = highlightedStages.map((stage) => stage.title).join(", ");
 
   return (
     <div className="section-gap">
@@ -589,7 +608,10 @@ function ResultsScreen(props: {
                 <h3>Общий риск закупки</h3>
                 <div className="score-xl">{formatNumber(props.results.totalRisk)}</div>
                 <RiskBadge score={props.results.totalRisk} />
-                <div>Наиболее рискованный этап: <strong>{props.results.mostDangerousStage.title}</strong></div>
+                <div>
+                  {highlightedStages.length === 1 ? "Наиболее рискованный этап" : "Наиболее рискованные этапы"}:{" "}
+                  <strong>{stageTitlesText}</strong>
+                </div>
                 <RiskScale score={props.results.totalRisk} />
               </section>
 
@@ -609,7 +631,10 @@ function ResultsScreen(props: {
         <section className="card print-card recommendations-card">
           <div className="card-header">
             <h2>Рекомендации по минимизации риска</h2>
-            <p>Сначала показаны общие меры по стратегии, затем меры для наиболее рискованного этапа.</p>
+            <p>
+              Сначала показаны общие меры по стратегии, затем специальные меры для{" "}
+              {highlightedStages.length === 1 ? "наиболее рискованного этапа" : "наиболее рискованных этапов"}.
+            </p>
           </div>
           <div className="card-content section-gap print-recommendations-grid">
             <div>
@@ -621,17 +646,27 @@ function ResultsScreen(props: {
               </ul>
             </div>
             <div>
-              <h3>2. Специальные меры для этапа: {props.results.mostDangerousStage.title}</h3>
-              <ul className="list">
-                {stageSpecificMeasures.map((measure) => (
-                  <li key={measure}>{measure}</li>
+              <h3>
+                2. Специальные меры для{" "}
+                {highlightedStages.length === 1 ? "этапа" : "этапов"}: {stageTitlesText}
+              </h3>
+              <div className="section-gap">
+                {highlightedStages.map((stage) => (
+                  <div key={stage.key}>
+                    <h3>{stage.title}</h3>
+                    <ul className="list">
+                      {STAGES[stage.key].stageMeasures.map((measure) => (
+                        <li key={`${stage.key}-${measure}`}>{measure}</li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="card no-print pdf-export-keep">
+        <section className="card no-print">
           <div className="card-header">
             <h2>Как работает расчёт</h2>
           </div>
@@ -774,13 +809,15 @@ export default function App() {
     const exec: StageResult = { ...execBase, legalScore: legalScores.exec };
     const totalRisk = Math.max(plan.R, proc.R, exec.R);
     const totalMeta = getRiskMeta(totalRisk);
-    const mostDangerousStage = [
+    const stageScores = [
       { key: "plan" as const, title: STAGES.plan.title, value: plan.R },
       { key: "proc" as const, title: STAGES.proc.title, value: proc.R },
       { key: "exec" as const, title: STAGES.exec.title, value: exec.R },
-    ].sort((left, right) => right.value - left.value)[0];
+    ];
+    const epsilon = 0.000001;
+    const mostDangerousStages = stageScores.filter((stage) => Math.abs(stage.value - totalRisk) < epsilon);
 
-    return { plan, proc, exec, totalRisk, totalMeta, mostDangerousStage };
+    return { plan, proc, exec, totalRisk, totalMeta, mostDangerousStages };
   }, [autoFinancialScore, data]);
 
   const progress = ((step + 1) / STEP_TITLES.length) * 100;

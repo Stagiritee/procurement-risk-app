@@ -372,7 +372,7 @@ h3 {
 
 .scale-zone-labels {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   font-size: 13px;
   font-weight: 700;
   text-align: center;
@@ -392,6 +392,10 @@ h3 {
 
 .zone-high {
   color: #d93025;
+}
+
+.zone-critical {
+  color: #991b1b;
 }
 
 .scale-track-wrap {
@@ -484,6 +488,11 @@ h3 {
   display: grid;
   gap: 10px;
   color: #4a586d;
+}
+
+.list li {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .formula-box {
@@ -593,6 +602,11 @@ h3 {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 10px 24px;
+}
+
+.print-recommendations-grid > div,
+.three-grid > * {
+  min-width: 0;
 }
 
 .print-only {
@@ -812,6 +826,10 @@ h3 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
+  }
+
+  .print-recommendations-grid > div {
+    min-width: 0;
   }
 
   .formula-stage-values span {
