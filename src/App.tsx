@@ -129,9 +129,9 @@ const STRATEGY_RULES: RiskRule[] = [
 ];
 
 const CORRUPTION_OPTIONS = [
-  { value: 1.1, label: "Малая закупка на ЕАТ", description: "α = 0,1 -> коэффициент 1,1" },
-  { value: 1.2, label: "Конкурентная закупка", description: "α = 0,2 -> коэффициент 1,2" },
-  { value: 1.3, label: "Единственный поставщик", description: "α = 0,3 -> коэффициент 1,3" },
+  { value: 1.1, label: "Малая закупка на ЕАТ", description: "α = 0,1 -> K = 1,1" },
+  { value: 1.2, label: "Конкурентная закупка", description: "α = 0,2 -> K = 1,2" },
+  { value: 1.3, label: "Единственный поставщик", description: "α = 0,3 -> K = 1,3" },
 ];
 
 const LEGAL_STAGE_CONFIG: Record<StageKey, LegalStageConfig> = {
@@ -216,7 +216,7 @@ const STAGES: Record<StageKey, StageConfig> = {
       { key: "acceptanceComplexity", label: "Сложность приёмки", scale: ["1 - обычная приёмка по акту", "2 - приёмка с комиссией", "3 - поэтапная приёмка с комиссией", "4 - приёмка особо сложных объектов закупки", "5 - приёмка с участием независимых экспертов"] },
       { key: "acceptanceCommissionExperience", label: "Опыт работы приёмочной комиссии", scale: ["1 - все обучены, есть опыт", "2 - 2 и больше человек обучены, опыт есть", "3 - 1 человек обучен, опыт средний", "4 - обучение отсутствует, опыт низкий", "5 - состав комиссии новый, опыта нет"] },
       { key: "warrantyDependence", label: "Гарантийная зависимость от поставщика", scale: ["1 - гарантия не требуется", "2 - гарантия до 2 лет, достаточно гарантии поставщика", "3 - гарантия более 2 лет", "4 - требуется гарантия производителя более 2 лет", "5 - поставщик является единственным производителем продукта"] },
-      { key: "paymentComplexity", label: "Потенциальная комплексность приёмки", scale: ["1 - единоразовая оплата", "2 - поэтапная оплата", "3 - поэтапная оплата с авансированием", "4 - оплата с казначейским сопровождением", "5 - поэтапная оплата с казначейским сопровождением и авансированием"] },
+      { key: "paymentComplexity", label: "Потенциальная комплексность оплаты", scale: ["1 - единоразовая оплата", "2 - поэтапная оплата", "3 - поэтапная оплата с авансированием", "4 - оплата с казначейским сопровождением", "5 - поэтапная оплата с казначейским сопровождением и авансированием"] },
     ],
     indicators: [
       { key: "fastAcceptance", label: "Приёмка осуществляется менее чем за 5 рабочих дней" },
@@ -485,7 +485,7 @@ function StageScreen(props: {
           ) : (
             <section className="alert-box">
               <strong>Коррупционная уязвимость не используется</strong>
-              <p>Для постпроцедурного этапа коэффициент коррупционной уязвимости не применяется.</p>
+              <p>Для постпроцедурного этапа коэффициент K не применяется.</p>
             </section>
           )}
         </div>
@@ -681,7 +681,7 @@ function ResultsScreen(props: {
                       <span>P = {formatNumber(props.results.plan.P)}</span>
                       <span>I = {formatNumber(props.results.plan.I)}</span>
                       <span>M = {formatNumber(props.results.plan.M)}</span>
-                      <span>Kc = {formatNumber(props.data.corruption.plan)}</span>
+                      <span>K = {formatNumber(props.data.corruption.plan)}</span>
                       <span>ΣZ = {props.results.plan.Z}</span>
                       <span>R = {formatNumber(props.results.plan.R)}</span>
                     </div>
@@ -692,7 +692,7 @@ function ResultsScreen(props: {
                       <span>P = {formatNumber(props.results.proc.P)}</span>
                       <span>I = {formatNumber(props.results.proc.I)}</span>
                       <span>M = {formatNumber(props.results.proc.M)}</span>
-                      <span>Kc = {formatNumber(props.data.corruption.proc)}</span>
+                      <span>K = {formatNumber(props.data.corruption.proc)}</span>
                       <span>ΣZ = {props.results.proc.Z}</span>
                       <span>R = {formatNumber(props.results.proc.R)}</span>
                     </div>
@@ -712,13 +712,13 @@ function ResultsScreen(props: {
                 <div className="formula-pretty">
                   <div className="formula-item">
                     <div className="formula-line">
-                      R<sub>plan</sub> = <span className="fraction"><span className="top">(P<sub>plan</sub> × I<sub>plan</sub>) × K<sub>c,plan</sub></span><span className="bottom">M<sub>plan</sub></span></span> + ΣZ<sub>plan</sub>
+                      R<sub>plan</sub> = <span className="fraction"><span className="top">(P<sub>plan</sub> × I<sub>plan</sub>) × K<sub>plan</sub></span><span className="bottom">M<sub>plan</sub></span></span> + ΣZ<sub>plan</sub>
                     </div>
                     <div className="formula-note">Для предпроцедурного этапа учитываются вероятность, значимость, коррупционная уязвимость, управляемость и бинарные индикаторы.</div>
                   </div>
                   <div className="formula-item">
                     <div className="formula-line">
-                      R<sub>proc</sub> = <span className="fraction"><span className="top">(P<sub>proc</sub> × I<sub>proc</sub>) × K<sub>c,proc</sub></span><span className="bottom">M<sub>proc</sub></span></span> + ΣZ<sub>proc</sub>
+                      R<sub>proc</sub> = <span className="fraction"><span className="top">(P<sub>proc</sub> × I<sub>proc</sub>) × K<sub>proc</sub></span><span className="bottom">M<sub>proc</sub></span></span> + ΣZ<sub>proc</sub>
                     </div>
                     <div className="formula-note">Для процедурного этапа используется та же логика расчёта, что и для предпроцедурного.</div>
                   </div>
@@ -742,7 +742,7 @@ function ResultsScreen(props: {
                   </div>
                   <div className="formula-item">
                     <div className="formula-line">
-                      K<sub>c</sub> = 1 + α
+                      K = 1 + α
                     </div>
                     <div className="formula-note">где α зависит от типа процедуры: 0,1 для малой закупки на ЕАТ, 0,2 для конкурентной закупки, 0,3 для закупки у единственного поставщика.</div>
                   </div>
